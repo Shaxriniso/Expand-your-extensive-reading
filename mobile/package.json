@@ -1,0 +1,20 @@
+{
+  "name": "bilimup-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "description": "BilimUp iOS and Android app shell (Capacitor). It opens the live BilimUp website inside a native app.",
+  "license": "SEE LICENSE IN ../LICENSE",
+  "scripts": {
+    "sync": "cap sync",
+    "ios": "cap open ios",
+    "android": "cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/core": "8.5.3",
+    "@capacitor/ios": "8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3"
+  }
+}

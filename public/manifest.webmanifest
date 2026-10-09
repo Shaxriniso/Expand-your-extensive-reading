@@ -1,0 +1,15 @@
+{
+  "name": "BilimUp",
+  "short_name": "BilimUp",
+  "description": "Math, Logic and languages — daily lessons, quizzes and challenges for ages 7–70.",
+  "start_url": "/#/today",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f6fbec",
+  "theme_color": "#16a34a",
+  "icons": [
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
