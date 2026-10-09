@@ -1,0 +1,16 @@
+{
+  "name": "bilimup",
+  "version": "1.0.0",
+  "private": true,
+  "description": "BilimUp — multilingual learning platform (website + installable app) for Math, Logic, English, Uzbek, Russian, Korean and Arabic.",
+  "type": "module",
+  "license": "SEE LICENSE IN LICENSE",
+  "engines": {
+    "node": ">=22.5"
+  },
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning server/index.js",
+    "dev": "node --disable-warning=ExperimentalWarning --watch server/index.js",
+    "test": "node --disable-warning=ExperimentalWarning --test test/*.test.js"
+  }
+}
