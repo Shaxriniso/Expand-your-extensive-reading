@@ -735,6 +735,7 @@ const submits = {
 
 function signedIn(r) {
   state.token = r.token;
+  state.me = null;
   store.set('token', r.token);
   setLang(r.user.lang || state.lang, false);
   location.hash = '#/today';
