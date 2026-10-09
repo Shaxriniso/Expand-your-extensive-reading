@@ -221,6 +221,9 @@ export function createApp(options = {}) {
   }
 
   // ---------- public ----------
+  // Used by Docker and uptime monitors.
+  router.add('GET', '/api/health', () => (db.prepare('SELECT 1').get(), { ok: true }));
+
   router.add('GET', '/api/meta', () => {
     const s = getSettings(db);
     return {
@@ -864,6 +867,8 @@ function bootstrapOwner(db, { email, password, name } = {}) {
   db.prepare("UPDATE users SET role = 'student' WHERE role = 'owner' AND email != ?").run(e);
   if (existing) {
     db.prepare("UPDATE users SET role = 'owner' WHERE id = ?").run(existing.id);
+    // OWNER_RESET_PASSWORD=1 sets the owner's password back to OWNER_PASSWORD (for a forgotten password).
+    if (password && process.env.OWNER_RESET_PASSWORD === '1') db.prepare('UPDATE users SET pass = ? WHERE id = ?').run(hashPassword(password), existing.id);
   } else if (password) {
     db.prepare("INSERT INTO users (email, pass, name, birth_date, role) VALUES (?, ?, ?, '1990-01-01', 'owner')").run(
       e, hashPassword(password), name || 'Owner',

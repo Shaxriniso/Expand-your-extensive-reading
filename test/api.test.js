@@ -283,6 +283,7 @@ test('video link parsing', () => {
 });
 
 test('static site, security headers and path traversal', async () => {
+  assert.deepEqual((await call('/api/health')).data, { ok: true });
   const home = await fetch(base + '/');
   assert.equal(home.status, 200);
   assert.match(home.headers.get('content-security-policy'), /default-src 'self'/);

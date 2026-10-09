@@ -53,6 +53,8 @@ Fully automatic Click/Payme payments need a merchant account with those companie
 
 ## Run it
 
+To put it online with a domain and HTTPS, follow [`deploy/SERVERGA-JOYLASH.md`](deploy/SERVERGA-JOYLASH.md) (Docker + Caddy, in Uzbek).
+
 You need **Node.js 22.5 or newer**. There are no other dependencies: the database is the SQLite engine built into Node.
 
 ```bash
@@ -64,6 +66,7 @@ npm test        # 17 automated tests
 | Variable | Meaning |
 |---|---|
 | `OWNER_EMAIL`, `OWNER_PASSWORD`, `OWNER_NAME` | Creates the owner account (or promotes an existing one). Only this email is ever the owner. |
+| `OWNER_RESET_PASSWORD` | Set to `1` once to reset the owner's password to `OWNER_PASSWORD` |
 | `PORT` | Default `3000` |
 | `DATA_DIR` | Where the database, secret key and uploaded videos are stored (default `./data`). **Back it up.** |
 | `APP_SECRET` | Optional signing secret; otherwise one is generated in `DATA_DIR` |
