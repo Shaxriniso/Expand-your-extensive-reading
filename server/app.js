@@ -272,6 +272,17 @@ export function createApp(options = {}) {
     return { user: publicUser(u), enrollments, completed, badges: badges(u) };
   });
 
+  // Members can delete their own account (required by the App Store).
+  router.add('DELETE', '/api/me', async (ctx) => {
+    const u = requireUser(ctx);
+    const b = await readJson(ctx.req);
+    if (u.role === 'owner') fail(400, 'cannot_delete_owner');
+    if (!verifyPassword(String(b.password || ''), u.pass)) fail(401, 'invalid_credentials');
+    db.prepare('DELETE FROM quiz_sessions WHERE user_id = ?').run(u.id);
+    db.prepare('DELETE FROM users WHERE id = ?').run(u.id);
+    return { ok: true };
+  });
+
   router.add('PATCH', '/api/me', async (ctx) => {
     const u = requireUser(ctx);
     const b = await readJson(ctx.req);

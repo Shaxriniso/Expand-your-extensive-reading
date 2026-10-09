@@ -1,0 +1,16 @@
+{
+  "appId": "uz.bilimup.app",
+  "appName": "BilimUp",
+  "webDir": "www",
+  "server": {
+    "url": "https://bilimup.uz",
+    "cleartext": false
+  },
+  "ios": {
+    "contentInset": "always",
+    "backgroundColor": "#f6fbec"
+  },
+  "android": {
+    "backgroundColor": "#f6fbec"
+  }
+}

@@ -251,6 +251,19 @@ test('vocabulary lessons show words in the learner language', async () => {
   assert.deepEqual(l.data.words[0], { word: '안녕하세요', meaning: 'Привет' });
 });
 
+test('members can delete their account; the owner cannot', async () => {
+  const r = await register({ email: 'leaver@example.com' });
+  const { token } = r.data;
+  await call('/api/subjects/math/start-beginner', { method: 'POST', token });
+  assert.equal((await call('/api/me', { method: 'DELETE', token, body: { password: 'wrong-pass' } })).status, 401);
+  assert.equal((await call('/api/me', { method: 'DELETE', token, body: { password: 'password123' } })).status, 200);
+  assert.equal((await call('/api/me', { token })).status, 401);
+  assert.equal((await call('/api/auth/login', { method: 'POST', body: { email: 'leaver@example.com', password: 'password123' } })).status, 401);
+  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM enrollments WHERE user_id = ?').get(r.data.user.id).n, 0);
+  const owner = await ownerToken();
+  assert.equal((await call('/api/me', { method: 'DELETE', token: owner, body: { password: OWNER.password } })).data.error, 'cannot_delete_owner');
+});
+
 test('stripe webhook signature verification', () => {
   const secret = 'whsec_test';
   const body = '{"type":"x"}';

@@ -2,7 +2,7 @@
 
 BilimUp is a paid learning platform for ages **7–70**. It teaches **Mathematics, Logic, English, Uzbek, Russian, Korean and Arabic**, and its interface is available in **O'zbekcha, English, Русский, 한국어 and العربية** (Arabic is shown right-to-left).
 
-One codebase is both the **website** and the **mobile app**. It is a Progressive Web App, so on Android or iPhone members open the site and tap **Install / Add to Home Screen**.
+One codebase is both the **website** and the **mobile app**. It is a Progressive Web App (members can tap **Install / Add to Home Screen**), and `mobile/` contains native **iOS and Android** app projects for the App Store and Google Play. See [`mobile/APP-STORE.md`](mobile/APP-STORE.md) (in Uzbek).
 
 ## What members get
 
@@ -58,7 +58,7 @@ You need **Node.js 22.5 or newer**. There are no other dependencies: the databas
 ```bash
 OWNER_EMAIL=you@example.com OWNER_PASSWORD='a-strong-password' OWNER_NAME='Your Name' npm start
 # open http://localhost:3000
-npm test        # 16 automated tests
+npm test        # 17 automated tests
 ```
 
 | Variable | Meaning |
@@ -95,5 +95,5 @@ test/api.test.js      end-to-end tests
 
 - Record the lesson videos and attach them in **Owner → Content** (all 105 lessons currently show "video is being prepared").
 - Have native speakers proofread the Korean and Arabic texts.
-- Publish to Google Play / the App Store by wrapping the PWA (for example with Capacitor or Trusted Web Activity).
+- Add Apple In-App Purchase / Google Play Billing so subscriptions can be sold inside the store apps (see `mobile/APP-STORE.md`).
 - Connect Click/Payme merchant APIs for automatic payment confirmation.

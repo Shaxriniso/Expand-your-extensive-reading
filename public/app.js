@@ -32,6 +32,8 @@ function guessLang() {
   return T[l] ? l : 'uz';
 }
 
+// Inside the iOS app (Capacitor) purchases must go through Apple, so payment screens are hidden there.
+const IN_IOS_APP = window.Capacitor?.getPlatform?.() === 'ios';
 const t = (key, params) => translate(state.lang, key, params);
 const esc = (s) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -152,9 +154,9 @@ views[''] = async () => {
       <div class="chips">${m.subjects.map((s) => `<span class="chip">${SUBJECT_ICON[s]} ${subjectName(s)}</span>`).join('')}</div>
     </section>
     <section class="grid3">${feats.map(([i, k]) => `<div class="card"><div class="ico">${i}</div><h3>${t(k)}</h3><p>${t(`${k}_t`)}</p></div>`).join('')}</section>
-    <section><h2 class="center">${t('pricing')}</h2>${m.trialDays ? `<p class="center muted">${t('trial_note', { days: m.trialDays })}</p>` : ''}
+    ${IN_IOS_APP ? '' : `<section><h2 class="center">${t('pricing')}</h2>${m.trialDays ? `<p class="center muted">${t('trial_note', { days: m.trialDays })}</p>` : ''}
       <div class="grid3">${m.plans.map((p) => `<div class="card plan"><h3>${esc(planLabel(p.id))}</h3><p class="price">${money(p.price, m.currency)}</p><p class="muted">${t('per_days', { days: p.days })}</p><a class="btn" href="#/register">${t('get_started')}</a></div>`).join('')}</div>
-    </section>`);
+    </section>`}`);
 };
 
 const planLabel = (id) => ({ trial: t('plan_trial'), gift: t('plan_gift') })[id] || id.charAt(0).toUpperCase() + id.slice(1);
@@ -220,7 +222,7 @@ views.today = async () => {
           <div class="task-h"><span class="big-ico">${SUBJECT_ICON[p.subject]}</span><div><h3>${subjectName(p.subject)}</h3><p class="muted">${levelName(p.level)} · ${p.progress.done}/${p.progress.total}</p></div></div>
           <div class="bar"><i style="width:${Math.round((100 * p.progress.done) / Math.max(1, p.progress.total))}%"></i></div>
           ${n ? `<p><b>${esc(tx(n.title))}</b> ${n.hasVideo ? '🎬' : ''}</p>${lockBadge(n.locked)}
-                 <a class="btn" href="${n.locked === 'premium' ? '#/billing' : `#/lesson/${n.id}`}">${n.locked === 'premium' ? t('subscribe') : t('continue')}</a>`
+                 ${n.locked === 'premium' && IN_IOS_APP ? '' : `<a class="btn" href="${n.locked === 'premium' ? '#/billing' : `#/lesson/${n.id}`}">${n.locked === 'premium' ? t('subscribe') : t('continue')}</a>`}`
               : `<a class="btn ghost" href="#/subject/${p.subject}">${t('practice')}</a>`}
         </div>`;
         })
@@ -241,7 +243,7 @@ views.today = async () => {
 };
 
 function accessBanner(u) {
-  if (u.role === 'owner' || u.role === 'admin') return '';
+  if (u.role === 'owner' || u.role === 'admin' || IN_IOS_APP) return '';
   if (u.access.active && u.access.plan !== 'trial') return '';
   const msg = u.access.active ? `${t('plan_trial')} · ${t('active_until', { date: fmtDate(u.access.expiresAt) })}` : t('no_access');
   return `<div class="banner"><span>${msg}</span><a class="btn sm" href="#/billing">${t('subscribe')}</a></div>`;
@@ -431,15 +433,20 @@ views.profile = async () => {
     <div class="card"><h3>${t('badges')}</h3>${me.badges.length ? `<div class="badges">${me.badges.map((b) => `<span class="badge">🏅 ${t(`b_${b}`)}</span>`).join('')}</div>` : `<p class="muted">${t('no_badges')}</p>`}</div>
     <div class="card"><h3>${t('subscription')}</h3>
       <p>${u.access.active ? `${esc(planLabel(u.access.plan))}${u.access.expiresAt ? ` · ${t('active_until', { date: fmtDate(u.access.expiresAt) })}` : ''}` : t('no_access')}</p>
-      <a class="btn" href="#/billing">${t('subscribe')}</a></div>
+      ${IN_IOS_APP ? '' : `<a class="btn" href="#/billing">${t('subscribe')}</a>`}</div>
     <div class="card"><h3>${t('ui_language')}</h3>${langSelect()}</div>
     <form class="card" data-submit="password"><h3>${t('change_password')}</h3><div class="err"></div>
       <label>${t('current_password')}<input type="password" name="password" required autocomplete="current-password"></label>
       <label>${t('new_password')}<input type="password" name="newPassword" required minlength="8" autocomplete="new-password"></label>
-      <button class="btn">${t('save')}</button></form>`, 'profile');
+      <button class="btn">${t('save')}</button></form>
+    ${u.role === 'owner' ? '' : `<form class="card danger" data-submit="delete-account"><h3>${t('delete_account')}</h3><p class="muted">${t('delete_account_t')}</p><div class="err"></div>
+      <label>${t('current_password')}<input type="password" name="password" id="delete-password" required autocomplete="current-password"></label>
+      <label class="check"><input type="checkbox" name="confirm" id="delete-confirm" required> ${t('delete_confirm')}</label>
+      <button class="btn danger">${t('delete_account')}</button></form>`}`, 'profile');
 };
 
 views.billing = async () => {
+  if (IN_IOS_APP) return render(`<h1>💎 ${t('subscription')}</h1><div class="card"><p>${t('ios_billing_note')}</p></div>`, 'profile');
   loading();
   const b = await api('/api/billing');
   const methods = b.methods.map((m) => `<option value="${esc(m)}">${esc(m.charAt(0).toUpperCase() + m.slice(1))}</option>`).join('');
@@ -688,6 +695,10 @@ const submits = {
     await api('/api/me', { method: 'PATCH', body: { password: f.password.value, newPassword: f.newPassword.value } });
     f.reset();
     f.querySelector('.err').innerHTML = `<div class="alert ok">${t('saved')}</div>`;
+  },
+  async 'delete-account'(f) {
+    await api('/api/me', { method: 'DELETE', body: { password: f.password.value } });
+    logout();
   },
   async pay(f, submitter) {
     const plan = f.plan.value;

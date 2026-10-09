@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">BilimUp</string>
+    <string name="title_activity_main">BilimUp</string>
+    <string name="package_name">uz.bilimup.app</string>
+    <string name="custom_url_scheme">uz.bilimup.app</string>
+</resources>
